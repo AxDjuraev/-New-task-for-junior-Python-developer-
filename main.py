@@ -29,9 +29,6 @@ class market:
       return -1
   def deleteItemAt(self, index):
     del self.items[index]
-  def removeItems(self):
-    del self.items
-    self.items = list([])
   def addItem(self, item):
     if not isinstance(item, object_):
       raise "wrong object type"
@@ -44,21 +41,21 @@ class market:
     for item in self.items:
       sum += item.getPrice()
     return sum
+  def getItemIndexByName(self, itemName):
+    for index in range(self.getItemsCount()):
+      item = self.getItemAt(index)
+      if item.name.lower() != itemName.lower():
+        continue
+      return index
+    raise ValueError("Наименование не найдено")
   def changeItemByOldName(self, oldName, newName, price):
-    for item in self.items:
-      if item.name != oldName:
-        continue
-      item.name = newName
-      item.price = price
-      return
-    raise "Наименование не найдено"
+    itemIndex = self.getItemIndexByName(oldName)
+    item = self.items[itemIndex]
+    item.name = newName
+    item.price = price
   def deleteItemByName(self, name):
-    for item in self.items:
-      if item.name != name:
-        continue
-      del self.items[self.items.index(item)]
-      return
-    raise "Наименование не найдено"
+    itemIndex = self.getItemIndexByName(name)
+    del self.items[itemIndex]
   def writeItems2File(self, file_name):
     newLineSymbol = '\n'
     content = ''
@@ -70,4 +67,5 @@ class market:
     for index in range(self.getItemsCount()):
       item = self.getItemAt(index)
       print(item.getName(), item.getPrice())
+
 
