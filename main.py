@@ -1,3 +1,5 @@
+import os
+
 class object_:
   name: str
   price: float
@@ -68,4 +70,24 @@ class market:
       item = self.getItemAt(index)
       print(item.getName(), item.getPrice())
 
+def inputWithoutWhiteSpaces(prompt):
+  userInput = input(prompt)
+  if userInput == "" or userInput.strip() == "":
+    raise ValueError("Пустое поле.")
+  return userInput.strip()
 
+if __name__ == "__main__":
+  file_name = inputWithoutWhiteSpaces("Имя файла: ").strip()
+  market1 = market()
+  if not os.path.exists(file_name):
+    with open(file_name, "w") as file_:
+      file_.write(" ")
+  with open(file_name,"r") as file_:
+    for line in file_:
+      line = line.split("—")
+      if len(line) != 2:
+        continue
+      line = list(map(lambda item: item.strip(), line))
+      (name, price) = (line[0], line[1])
+      obj = object_(name, float(price))
+      market1.addItem(obj)
