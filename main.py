@@ -76,18 +76,41 @@ def inputWithoutWhiteSpaces(prompt):
     raise ValueError("Пустое поле.")
   return userInput.strip()
 
+def getActionFromUser(market0):
+  actions = {
+    "Добавить в список":        lambda: market0.addNewItem(inputWithoutWhiteSpaces("Наименование: "), inputWithoutWhiteSpaces("Цена: ")),
+    "Изменить запись в списке": lambda: market0.changeItemByOldName(inputWithoutWhiteSpaces("Наименование: "), inputWithoutWhiteSpaces("Новое наименование: "), inputWithoutWhiteSpaces("Цена: ")),
+    "Удалить из списка":        lambda: market0.deleteItemByName(inputWithoutWhiteSpaces("Наименование: ")),
+    "Вычесть общую сумму":      lambda: f'Общая сумма: {market0.getItemsPriceSum()}'
+  }  
+  for actionIndex in range(len(actions)):
+    actionName = list(actions.keys())[actionIndex]
+    print(f'{(actionIndex+1)}.{actionName}')
+  actionIndex = int(inputWithoutWhiteSpaces("Номер действия: "))-1
+  if actionIndex < 0 or actionIndex > len(actions)-1:
+    raise ValueError("Номер действия виходить за гран")
+  result = list(actions.values())[actionIndex].__call__()
+  if result:
+    print(result)
+  
 if __name__ == "__main__":
-  file_name = inputWithoutWhiteSpaces("Имя файла: ").strip()
-  market1 = market()
-  if not os.path.exists(file_name):
-    with open(file_name, "w") as file_:
-      file_.write(" ")
-  with open(file_name,"r") as file_:
-    for line in file_:
-      line = line.split("—")
-      if len(line) != 2:
-        continue
-      line = list(map(lambda item: item.strip(), line))
-      (name, price) = (line[0], line[1])
-      obj = object_(name, float(price))
-      market1.addItem(obj)
+  try:
+    file_name = inputWithoutWhiteSpaces("Имя файла: ").strip()
+    market1 = market()
+    if not os.path.exists(file_name):
+      with open(file_name, "w") as file_:
+        file_.write(" ")
+    with open(file_name,"r") as file_:
+      for line in file_:
+        line = line.split("—")
+        if len(line) != 2:
+          continue
+        line = list(map(lambda item: item.strip(), line))
+        (name, price) = (line[0], line[1])
+        obj = object_(name, float(price))
+        market1.addItem(obj)
+    getActionFromUser(market1)
+    market1.writeItems2File(file_name)
+  except Exception as exception:
+    print(f'Error: {str(exception)}')
+
